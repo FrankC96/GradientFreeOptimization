@@ -75,7 +75,7 @@ def pid_eval(x):
 
 def cost(x):
 
-    stable_thresh = 1000000000
+    stable_thresh = 10
     x1 = x[0]
     x2 = x[1]
 
