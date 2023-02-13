@@ -5,28 +5,33 @@ import matplotlib.pyplot as plt
 
 def pid_eval(x):
 
-    def ref(l):
-        return 0.2
-
-    A = np.array(   [[-0.0015,   -0.0013,    0.2504,         0],
-                    [-0.0001,   -0.0122,   -3.4096,         0],
-                    [0.0000,  -0.0003,   -0.0461,         0],
-                    [0,         0,    1.0000,         0]])
-
-    B = np.array([[0.0011],
-                  [0.0238],
-                  [-0.0006],
-                  [0]])
-
-    C = np.array([0, 0, 0, 1])
-
+    M = 1
+    g = 9.81
+    l = 0.5
+    J = 0.001
+    A = np.array([[0 ,1], [(M*g*l)/(2*J), 0]])
+    B = np.array([[0], [1/(J)]])
+    C = np.array([1, 0])
     D = np.array([0])
+    # A = np.array(   [[-0.0015,   -0.0013,    0.2504,         0],
+    #                 [-0.0001,   -0.0122,   -3.4096,         0],
+    #                 [0.0000,  -0.0003,   -0.0461,         0],
+    #                 [0,         0,    1.0000,         0]])
+    #
+    # B = np.array([[0.0011],
+    #               [0.0238],
+    #               [-0.0006],
+    #               [0]])
+    #
+    # C = np.array([0, 0, 0, 1])
+    #
+    # D = np.array([0])
 
     Kp = x[0]
     Ki = x[1]
     Kd = x[2]
 
-    stb = 250
+    stb = 400
     if np.shape(Kp) == ():
         if Kp > stb:
             print("clipping: ", Kp)
@@ -61,17 +66,17 @@ def pid_eval(x):
     con_pid = (Kp*s + Ki + Kd * s**2)/s
 
     H = ctr.feedback(sys_tf * con_pid, 1)
-    t_sim = 500
+    t_sim = 450
 
     t = np.arange(t_sim)
-    u = 0.2 * np.ones(t_sim)
-    x0 = np.array([0, 0, 0, 0, 0])
+    u = np.pi/10 * np.ones(t_sim)
+    x0 = np.array([0, 0, 0])
 
     yout, T, xout = ctr.lsim(H, u, t, x0)
 
     error = np.sum((u - yout) ** 2) + 100 * np.sum((u[-1:100] - yout[t_sim:-1]) ** 2)
 
-    return error, yout
+    return error  # RETURN ALSO yout
 
 def cost(x):
 
@@ -97,6 +102,6 @@ def cost(x):
     thefuck = x1**2 + x2**2
     eggholder = -(x2 + 47) * np.sin(np.sqrt(np.abs(x1/2 + (x2 + 47)))) - x1 * np.sin(np.sqrt(np.abs(x1 - (x2 + 47))))
     mccormick = np.sin(x1 + x2) + (x1 - x2)**2 - 1.5*x1 + 2.5*x2 + 1
-    rosenbrock = (1-x1)**2 + 100 * (x2 - x1**2)**2
+    rosenbrock = (0-x1)**2 + 100 * (x2 - x1**2)**2
     rastrigin = 20 + (x1**2 - 10*np.cos(2*np.pi*x1) + x2**2 - 10*np.cos(2*np.pi*x2))
     return rosenbrock
